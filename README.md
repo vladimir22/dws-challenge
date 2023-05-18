@@ -48,10 +48,10 @@ Before deploying this project into PROD I would pay attention on the next:
 - Extend API by adding HTTP Endpoints to check account ballance 
 - Introduce HTTP response body in a JSON format
 - Introduce UUID per each transaction to have better logging and clear HTTP response
-- Enhance Exception Handling, add localisation
+- Enhance Exception Handling, add message localization
 - Implement Security
 - Enhance Logging
-- Use persistance instead of ConcurrentHashMap
+- Use persistence (Transactional DB) instead of ConcurrentHashMap
 
 
 
