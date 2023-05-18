@@ -29,7 +29,9 @@ to run. In your tests you should mock this service.
 
 ## How To Run
 
-It is not possible to run application because NotificationService interface is not implemented, but is is possible to build application and run tests with mocked NotificationService bean, example:
+Application cannot be started because NotificationService interface is *not* implemented, but it is possible to build application and run tests with mocked NotificationService bean.
+
+Example:
 
 ```sh
 git clone https://github.com/vladimir22/dws-challenge.git
