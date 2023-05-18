@@ -41,6 +41,17 @@ gradle test
 ```
 
 
+## TODO
+Before deploying this project into PROD I would pay attention on the next:
+- Implement NotificationService to send notification in async mode
+- Consider to avoid to use BigDecimal type for amount parameter because floating point numbers are not precise and may cause problems
+- Extend API by adding HTTP Endpoints to check account ballance 
+- Introduce HTTP response body in a JSON format
+- Introduce UUID per each transaction to have better logging and clear HTTP response
+- Enhance Exception Handling, add localisation
+- Implement Security
+- Enhance Logging
+- Use persistance instead of ConcurrentHashMap
 
 
 
