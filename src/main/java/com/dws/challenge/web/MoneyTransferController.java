@@ -31,7 +31,7 @@ public class MoneyTransferController {
     @PostMapping
     public ResponseEntity<String> transfer(@RequestParam @NotEmpty String fromAccountId,
                                                  @RequestParam @NotEmpty String toAccountId,
-                                                 // N.B.: as I know amount is better to represent as BigInteger because floating point numbers are not precise
+                                                 // N.B.: as I remember, amount is better to represent as BigInteger because floating point numbers are not precise
                                                  @RequestParam @Min(0) BigDecimal amount) {
 
         // Get the accounts
