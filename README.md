@@ -24,7 +24,7 @@ to run. In your tests you should mock this service.
 
 - Endpoint implementation in the [MoneyTransferController.java](./src/main/java/com/dws/challenge/web/MoneyTransferController.java) class which is covered by tests in the [MoneyTransferControllerTest](./src/test/java/com/dws/challenge/web/MoneyTransferControllerTest.java)
 
-- Service implementation in the [MoneyTransferService.java](./src/main/java/com/dws/challenge/service/MoneyTransferService.java) which is covered by tests in the [MoneyTransferControllerTest.java](./src/test/java/com/dws/challenge/web/MoneyTransferControllerTest.java)
+- Service implementation in the [MoneyTransferService.java](./src/main/java/com/dws/challenge/service/MoneyTransferService.java) which is covered by tests in the [MoneyTransferControllerTest.java](./src/test/java/com/dws/challenge/service/MoneyTransferServiceTest.java)
 
 
 ## How To Run
