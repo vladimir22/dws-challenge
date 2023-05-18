@@ -5,10 +5,9 @@ import com.dws.challenge.exception.MoneyTransferException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import java.math.BigDecimal;
 
 @Service
 @Slf4j
@@ -25,17 +24,17 @@ public class MoneyTransferService {
 
         lock.lock();
         try {
-                BigDecimal fromAccountBalance = fromAccount.getBalance();
-                if (fromAccountBalance.compareTo(amount) < 0) {
-                    throw new MoneyTransferException("Insufficient balance!");
-                }
+            BigDecimal fromAccountBalance = fromAccount.getBalance();
+            if (fromAccountBalance.compareTo(amount) < 0) {
+                throw new MoneyTransferException("Insufficient balance!");
+            }
 
-                BigDecimal toAccountBalance = toAccount.getBalance();
+            BigDecimal toAccountBalance = toAccount.getBalance();
 
-                fromAccount.setBalance(fromAccountBalance.subtract(amount));
-                toAccount.setBalance(toAccountBalance.add(amount));
+            fromAccount.setBalance(fromAccountBalance.subtract(amount));
+            toAccount.setBalance(toAccountBalance.add(amount));
 
-                log.info("Transferred amount '{}' from account {} to account {}", amount, fromAccount.getAccountId(), toAccount.getAccountId());
+            log.info("Transferred amount '{}' from account {} to account {}", amount, fromAccount.getAccountId(), toAccount.getAccountId());
         } finally {
             lock.unlock();
         }

@@ -3,29 +3,19 @@ package com.dws.challenge.service;
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.exception.MoneyTransferException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.dws.challenge.web.MoneyTransferController.TRANSFERRED_AMOUNT_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -87,7 +77,7 @@ class MoneyTransferServiceTest {
 
     @ParameterizedTest
     @CsvSource({"1000,1000,1,1000"})
-    void testTransferMoney_ConcurrentTransfer(BigDecimal fromAccountBalance, BigDecimal toAccountBalance, BigDecimal amount, Integer numberOfTransactions) throws InterruptedException {
+    void testTransferMoney_ConcurrentTransfer(BigDecimal fromAccountBalance, BigDecimal toAccountBalance, BigDecimal amount, Integer numberOfTreads) throws InterruptedException {
 
         // Create accounts
         Account fromAccount = new Account("Id-123");
@@ -99,9 +89,9 @@ class MoneyTransferServiceTest {
         accountsService.createAccount(toAccount);
 
         // Submit forward money transfer requests in parallel
-        CountDownLatch latch = new CountDownLatch(numberOfTransactions*2);
-        ThreadPoolExecutor forwardExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTransactions);
-        for (int i = 0; i < numberOfTransactions; i++) {
+        CountDownLatch latch = new CountDownLatch(numberOfTreads * 2);
+        ThreadPoolExecutor forwardExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        for (int i = 0; i < numberOfTreads; i++) {
             forwardExecutor.submit(() -> {
                 moneyTransferService.transferMoney(fromAccount, toAccount, amount);
                 latch.countDown();
@@ -109,8 +99,8 @@ class MoneyTransferServiceTest {
         }
 
         // Submit backward money transfer requests in parallel
-        ThreadPoolExecutor backwardExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTransactions);
-        for (int i = 0; i < numberOfTransactions; i++) {
+        ThreadPoolExecutor backwardExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        for (int i = 0; i < numberOfTreads; i++) {
             backwardExecutor.submit(() -> {
                 moneyTransferService.transferMoney(toAccount, fromAccount, amount);
                 latch.countDown();
@@ -120,11 +110,11 @@ class MoneyTransferServiceTest {
         // Wait for all threads to finish
         forwardExecutor.shutdown();
         backwardExecutor.shutdown();
-        assertTrue(latch.await(numberOfTransactions, java.util.concurrent.TimeUnit.SECONDS));
+        assertTrue(latch.await(numberOfTreads, java.util.concurrent.TimeUnit.SECONDS));
 
         // Final balances equals to initial balances
-        assertEquals(fromAccountBalance, fromAccount.getBalance(), "fromAccount balance is not equal to the initial (fromAccount.getBalance()="+fromAccount.getBalance() + ", toAccount.getBalance()="+ toAccount.getBalance() + ")");
-        assertEquals(toAccountBalance, toAccount.getBalance(), "toAccount balance is not equal to the initial (fromAccount.getBalance()="+fromAccount.getBalance() + ", toAccount.getBalance()="+ toAccount.getBalance() + ")");
+        assertEquals(fromAccountBalance, fromAccount.getBalance(), "fromAccount balance is not equal to the initial (fromAccount.getBalance()=" + fromAccount.getBalance() + ", toAccount.getBalance()=" + toAccount.getBalance() + ")");
+        assertEquals(toAccountBalance, toAccount.getBalance(), "toAccount balance is not equal to the initial (fromAccount.getBalance()=" + fromAccount.getBalance() + ", toAccount.getBalance()=" + toAccount.getBalance() + ")");
     }
 
 }

@@ -30,9 +30,9 @@ public class MoneyTransferController {
 
     @PostMapping
     public ResponseEntity<String> transfer(@RequestParam @NotEmpty String fromAccountId,
-                                                 @RequestParam @NotEmpty String toAccountId,
-                                                 // N.B.: as I remember, amount is better to represent as BigInteger because floating point numbers are not precise
-                                                 @RequestParam @Min(0) BigDecimal amount) {
+                                           @RequestParam @NotEmpty String toAccountId,
+                                           // N.B.: as I remember, amount is better to represent as BigInteger because floating point numbers are not precise
+                                           @RequestParam @Min(0) BigDecimal amount) {
 
         // Get the accounts
         Account fromAccount = accountsService.getAccount(fromAccountId);
@@ -49,12 +49,12 @@ public class MoneyTransferController {
 
         // Notify the accounts, if notification fails, log the error and continue
         try {
-            notificationService.notifyAboutTransfer(fromAccount, String.format(TRANSFERRED_AMOUNT_MESSAGE,amount, toAccount));
-        }  catch (Exception e) {
+            notificationService.notifyAboutTransfer(fromAccount, String.format(TRANSFERRED_AMOUNT_MESSAGE, amount, toAccount));
+        } catch (Exception e) {
             log.error("Notification error while transferring from account {} about the transfer", fromAccountId, e);
         }
         try {
-            notificationService.notifyAboutTransfer(toAccount,  String.format(RECEIVED_AMOUNT_MESSAGE,amount, fromAccount));
+            notificationService.notifyAboutTransfer(toAccount, String.format(RECEIVED_AMOUNT_MESSAGE, amount, fromAccount));
         } catch (Exception e) {
             log.error("Notification error while transferring to account {} about the transfer", toAccountId, e);
         }
@@ -63,8 +63,7 @@ public class MoneyTransferController {
     }
 
     @ExceptionHandler(MoneyTransferException.class)
-    public ResponseEntity<String> handleExceptions(MoneyTransferException e)
-    {
+    public ResponseEntity<String> handleExceptions(MoneyTransferException e) {
         return ResponseEntity
                 .badRequest()
                 .body(e.getMessage());

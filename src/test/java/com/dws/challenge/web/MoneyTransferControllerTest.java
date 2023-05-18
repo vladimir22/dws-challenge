@@ -24,13 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.dws.challenge.web.MoneyTransferController.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -78,7 +75,6 @@ class MoneyTransferControllerTest {
                         .param("amount", "10"))
                 .andExpect(status().isBadRequest());
     }
-
 
     @Test
     void amountIsEmpty() throws Exception {
@@ -135,7 +131,6 @@ class MoneyTransferControllerTest {
                         .param("amount", "100000"))
                 .andExpect(status().isBadRequest());
     }
-
 
     @ParameterizedTest
     @CsvSource({"1000,1000,10", "1000,1000,1000", "1,0,1"})
