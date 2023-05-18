@@ -37,7 +37,7 @@ Example:
 git clone https://github.com/vladimir22/dws-challenge.git
 cd dws-challenge
 gradle build
-gradle test -i
+gradle test
 ```
 
 
