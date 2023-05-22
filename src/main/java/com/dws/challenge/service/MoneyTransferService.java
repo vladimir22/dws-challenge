@@ -13,31 +13,29 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class MoneyTransferService {
 
-    private Lock lock = new ReentrantLock();
-
-
     public void transferMoney(Account fromAccount, Account toAccount, BigDecimal amount) {
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new MoneyTransferException("Incorrect amount!");
         }
 
-        lock.lock();
-        try {
+        log.info("Money transfer started: amount='{}', fromAccount={}, toAccount={}", amount, fromAccount.getAccountId(), toAccount.getAccountId());
+
+        synchronized (fromAccount) {
             BigDecimal fromAccountBalance = fromAccount.getBalance();
             if (fromAccountBalance.compareTo(amount) < 0) {
                 throw new MoneyTransferException("Insufficient balance!");
             }
-
-            BigDecimal toAccountBalance = toAccount.getBalance();
-
             fromAccount.setBalance(fromAccountBalance.subtract(amount));
-            toAccount.setBalance(toAccountBalance.add(amount));
-
-            log.info("Transferred amount '{}' from account {} to account {}", amount, fromAccount.getAccountId(), toAccount.getAccountId());
-        } finally {
-            lock.unlock();
+            log.info("Withdraw money: amount='{}', fromAccount={}, toAccount={}", amount, fromAccount.getAccountId(), toAccount.getAccountId());
         }
 
+        synchronized (toAccount) {
+            BigDecimal toAccountBalance = toAccount.getBalance();
+            toAccount.setBalance(toAccountBalance.add(amount));
+            log.info("Deposit money: amount='{}', fromAccount={}, toAccount={}", amount, fromAccount.getAccountId(), toAccount.getAccountId());
+        }
+
+        log.info("Money transfer finished: amount='{}', fromAccount={}, toAccount={}", amount, fromAccount.getAccountId(), toAccount.getAccountId());
     }
 }

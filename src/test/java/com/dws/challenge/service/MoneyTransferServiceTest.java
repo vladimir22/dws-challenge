@@ -76,45 +76,85 @@ class MoneyTransferServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"1000,1000,1,1000"})
-    void testTransferMoney_ConcurrentTransfer(BigDecimal fromAccountBalance, BigDecimal toAccountBalance, BigDecimal amount, Integer numberOfTreads) throws InterruptedException {
+    @CsvSource({"2000,2000,2000,1,1000"})
+    void testTransferMoney_ConcurrentTransfer(BigDecimal account1Balance, BigDecimal account2Balance, BigDecimal account3Balance, BigDecimal amount, Integer numberOfTreads) throws InterruptedException {
 
-        // Create accounts
-        Account fromAccount = new Account("Id-123");
-        fromAccount.setBalance(fromAccountBalance);
-        accountsService.createAccount(fromAccount);
+        // Let's create 3 different accounts and transfer money between them in parallel
+        Account account1 = new Account("account1-Id");
+        account1.setBalance(account1Balance);
+        accountsService.createAccount(account1);
 
-        Account toAccount = new Account("Id-456");
-        toAccount.setBalance(toAccountBalance);
-        accountsService.createAccount(toAccount);
+        Account account2 = new Account("account2-Id");
+        account2.setBalance(account2Balance);
+        accountsService.createAccount(account2);
 
-        // Submit forward money transfer requests in parallel
-        CountDownLatch latch = new CountDownLatch(numberOfTreads * 2);
-        ThreadPoolExecutor forwardExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        Account account3 = new Account("account3-Id");
+        account3.setBalance(account3Balance);
+        accountsService.createAccount(account3);
+
+        // account1 -> account2, account1 -> account3
+        CountDownLatch latch = new CountDownLatch(numberOfTreads * 6);
+        ThreadPoolExecutor from1To2Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
         for (int i = 0; i < numberOfTreads; i++) {
-            forwardExecutor.submit(() -> {
-                moneyTransferService.transferMoney(fromAccount, toAccount, amount);
+            from1To2Executor.submit(() -> {
+                moneyTransferService.transferMoney(account1, account2, amount);
+                latch.countDown();
+            });
+        }
+        ThreadPoolExecutor from1To3Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        for (int i = 0; i < numberOfTreads; i++) {
+            from1To3Executor.submit(() -> {
+                moneyTransferService.transferMoney(account1, account3, amount);
                 latch.countDown();
             });
         }
 
-        // Submit backward money transfer requests in parallel
-        ThreadPoolExecutor backwardExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        // account2 -> account1, account2 -> account3
+        ThreadPoolExecutor from2To1Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
         for (int i = 0; i < numberOfTreads; i++) {
-            backwardExecutor.submit(() -> {
-                moneyTransferService.transferMoney(toAccount, fromAccount, amount);
+            from2To1Executor.submit(() -> {
+                moneyTransferService.transferMoney(account2, account1, amount);
+                latch.countDown();
+            });
+        }
+        ThreadPoolExecutor from2To3Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        for (int i = 0; i < numberOfTreads; i++) {
+            from2To3Executor.submit(() -> {
+                moneyTransferService.transferMoney(account2, account3, amount);
+                latch.countDown();
+            });
+        }
+
+        // account3 -> account1, account3 -> account2
+        ThreadPoolExecutor from3To1Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        for (int i = 0; i < numberOfTreads; i++) {
+            from3To1Executor.submit(() -> {
+                moneyTransferService.transferMoney(account3, account1, amount);
+                latch.countDown();
+            });
+        }
+        ThreadPoolExecutor from3To2Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        for (int i = 0; i < numberOfTreads; i++) {
+            from3To2Executor.submit(() -> {
+                moneyTransferService.transferMoney(account3, account2, amount);
                 latch.countDown();
             });
         }
 
         // Wait for all threads to finish
-        forwardExecutor.shutdown();
-        backwardExecutor.shutdown();
+        from1To2Executor.shutdown();
+        from1To3Executor.shutdown();
+        from2To1Executor.shutdown();
+        from2To3Executor.shutdown();
+        from3To1Executor.shutdown();
+        from3To2Executor.shutdown();
+
+        // Set up wait timeout
         assertTrue(latch.await(numberOfTreads, java.util.concurrent.TimeUnit.SECONDS));
 
-        // Final balances equals to initial balances
-        assertEquals(fromAccountBalance, fromAccount.getBalance(), "fromAccount balance is not equal to the initial (fromAccount.getBalance()=" + fromAccount.getBalance() + ", toAccount.getBalance()=" + toAccount.getBalance() + ")");
-        assertEquals(toAccountBalance, toAccount.getBalance(), "toAccount balance is not equal to the initial (fromAccount.getBalance()=" + fromAccount.getBalance() + ", toAccount.getBalance()=" + toAccount.getBalance() + ")");
+        // Final balances equal to initial balances
+        assertEquals(account1Balance, account1.getBalance(), "account1 balance is not equal to the initial (account1.getBalance()=" + account1.getBalance() + ", account2.getBalance()=" + account2.getBalance() + ", account3.getBalance()=" + account3.getBalance() + ")");
+        assertEquals(account2Balance, account2.getBalance(), "account2 balance is not equal to the initial (account1.getBalance()=" + account1.getBalance() + ", account2.getBalance()=" + account2.getBalance() + ", account3.getBalance()=" + account3.getBalance() + ")");
+        assertEquals(account3Balance, account3.getBalance(), "account3 balance is not equal to the initial (account1.getBalance()=" + account1.getBalance() + ", account2.getBalance()=" + account2.getBalance() + ", account3.getBalance()=" + account3.getBalance() + ")");
     }
-
 }
