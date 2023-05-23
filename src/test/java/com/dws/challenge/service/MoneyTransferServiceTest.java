@@ -3,6 +3,7 @@ package com.dws.challenge.service;
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.exception.MoneyTransferException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -75,7 +77,49 @@ class MoneyTransferServiceTest {
         assertThrows(MoneyTransferException.class, () -> moneyTransferService.transferMoney(fromAccount, toAccount, amount));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Cover deadlock")
+    @CsvSource({"1000,1000,1,1000"})
+    void testTransferMoney_CoverDeadlock(BigDecimal account1Balance, BigDecimal account2Balance, BigDecimal amount, Integer numberOfTreads) throws InterruptedException {
+
+        // Let's create 2 accounts and try to emulate deadlock
+        Account account1 = new Account("account1-Id");
+        account1.setBalance(account1Balance);
+        accountsService.createAccount(account1);
+
+        Account account2 = new Account("account2-Id");
+        account2.setBalance(account2Balance);
+        accountsService.createAccount(account2);
+
+        // Transfer money in parallel mode: account1 -> account2, account2 -> account1
+        CountDownLatch latch = new CountDownLatch(numberOfTreads * 2);
+        ThreadPoolExecutor from1To2Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        for (int i = 0; i < numberOfTreads; i++) {
+            from1To2Executor.submit(() -> {
+                moneyTransferService.transferMoney(account1, account2, amount);
+                latch.countDown();
+            });
+        }
+        ThreadPoolExecutor from2To1Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfTreads);
+        for (int i = 0; i < numberOfTreads; i++) {
+            from2To1Executor.submit(() -> {
+                moneyTransferService.transferMoney(account2, account1, amount);
+                latch.countDown();
+            });
+        }
+
+        // Wait for all threads to finish
+        from1To2Executor.shutdown();
+        from2To1Executor.shutdown();
+
+        // Set up wait timeout
+        assertTrue(latch.await(numberOfTreads, TimeUnit.SECONDS), "Deadlock detected");
+
+        // Final balances equal to initial balances
+        assertEquals(account1Balance, account1.getBalance(), "account1 balance is not equal to the initial (account1.getBalance()=" + account1.getBalance() + ", account2.getBalance()=" + account2.getBalance() + ")");
+        assertEquals(account2Balance, account2.getBalance(), "account2 balance is not equal to the initial (account1.getBalance()=" + account1.getBalance() + ", account2.getBalance()=" + account2.getBalance() + ")");
+    }
+
+    @ParameterizedTest(name = "Transfer money between 3 different accounts in parallel mode")
     @CsvSource({"2000,2000,2000,1,1000"})
     void testTransferMoney_ConcurrentTransfer(BigDecimal account1Balance, BigDecimal account2Balance, BigDecimal account3Balance, BigDecimal amount, Integer numberOfTreads) throws InterruptedException {
 
@@ -150,7 +194,7 @@ class MoneyTransferServiceTest {
         from3To2Executor.shutdown();
 
         // Set up wait timeout
-        assertTrue(latch.await(numberOfTreads, java.util.concurrent.TimeUnit.SECONDS));
+        assertTrue(latch.await(numberOfTreads, java.util.concurrent.TimeUnit.SECONDS), "Deadlock detected");
 
         // Final balances equal to initial balances
         assertEquals(account1Balance, account1.getBalance(), "account1 balance is not equal to the initial (account1.getBalance()=" + account1.getBalance() + ", account2.getBalance()=" + account2.getBalance() + ", account3.getBalance()=" + account3.getBalance() + ")");
