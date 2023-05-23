@@ -33,17 +33,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      # - name: Build with Maven ## runs the Maven package target in non-interactive mode to ensure that your code builds, tests pass, and a package can be created.
-      #   run: mvn --batch-mode -DskipTests package
+      - name: Report ## https://octopus.com/blog/githubactions-running-unit-tests
+        uses: dorny/test-reporter@v1
+        if: always() ## generate the report even if the Test step above was set to fail in the event of failed tests.
+        with:
+          name: Gradle Tests
+          path: build/test-results/test/*.xml
+          reporter: java-junit
+          fail-on-error: true
 
-      # - name: Test
-      #   run: mvn --batch-mode -Dmaven.test.failure.ignore=true test
-
-      # - name: Report ## https://octopus.com/blog/githubactions-running-unit-tests
-      #   uses: dorny/test-reporter@v1
-      #   if: always() ## generate the report even if the Test step above was set to fail in the event of failed tests.
-      #   with:
-      #     name: Maven Tests
-      #     path: target/surefire-reports/*.xml
-      #     reporter: java-junit
-      #     fail-on-error: true
