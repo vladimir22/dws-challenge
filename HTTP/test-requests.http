@@ -1,0 +1,144 @@
+### Create account1
+POST http://localhost:18080/v1/accounts HTTP/1.1
+Content-Type: application/json
+Cookie: test=cookie-value
+
+{ "accountId" : "account1", "balance": 1000 }
+
+> {%
+    client.test("Create account1", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+ %}
+
+
+### Create account2
+POST http://localhost:18080/v1/accounts HTTP/1.1
+Content-Type: application/json
+Cookie: test=cookie-value
+
+{ "accountId" : "account2", "balance": 1000 }
+
+> {%
+    client.test("Create account2", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+ %}
+
+
+### Get account1
+GET http://localhost:18080/v1/accounts/account1
+Accept: application/json
+
+> {%
+    client.test("Get account1", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.body.accountId === "account1", "accountId is not account1");
+        client.assert(response.body.balance === 1000, "balance is not 1000");
+    });
+ %}
+
+
+### Get account2
+GET http://localhost:18080/v1/accounts/account2
+Accept: application/json
+
+> {%
+    client.test("Get account2", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.body.accountId === "account2", "accountId is not account1");
+        client.assert(response.body.balance === 1000, "balance is not 1000");
+    });
+ %}
+
+
+### Transfer money with wrong_account1
+POST http://localhost:18080/v1/transfer?fromAccountId=wrong_account1&toAccountId=account2&amount=100
+
+> {%
+    client.test("Transfer money with wrong_account1", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+        client.assert(response.body === "Account with id wrong_account1 does not exist", "unexpected response body");
+    });
+ %}
+
+
+### Transfer money with wrong_account2
+POST http://localhost:18080/v1/transfer?fromAccountId=account1&toAccountId=wrong_account2&amount=100
+
+> {%
+    client.test("Transfer money with wrong_account2", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+        client.assert(response.body === "Account with id wrong_account2 does not exist", "Response body is incorrect");
+    });
+ %}
+
+
+### Transfer money with amount=0
+POST http://localhost:18080/v1/transfer?fromAccountId=account1&toAccountId=account2&amount=0
+
+> {%
+    client.test("Transfer money with amount=0", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+        client.assert(response.body === "Incorrect amount!", "Response body is incorrect");
+    });
+ %}
+
+
+### Transfer money with amount=-1
+POST http://localhost:18080/v1/transfer?fromAccountId=account1&toAccountId=account2&amount=-1
+
+> {%
+    client.test("Transfer money with amount=-1", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+        client.assert(response.body === "Incorrect amount!", "Response body is incorrect");
+    });
+ %}
+
+
+### Transfer money with amount=1000000
+POST http://localhost:18080/v1/transfer?fromAccountId=account1&toAccountId=account2&amount=1000000
+
+> {%
+    client.test("Transfer money with amount=-1", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+        client.assert(response.body === "Insufficient balance!", "Response body is incorrect");
+    });
+ %}
+
+
+### Transfer money with amount=1000
+POST http://localhost:18080/v1/transfer?fromAccountId=account1&toAccountId=account2&amount=1000
+
+> {%
+    client.test("Transfer money with amount=1000", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.body === "Amount transferred successfully!", "Response body is incorrect");
+    });
+ %}
+
+
+### Get account1
+GET http://localhost:18080/v1/accounts/account1
+Accept: application/json
+
+> {%
+    client.test("Get account1", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.body.accountId === "account1", "accountId is not account1");
+        client.assert(response.body.balance === 0, "balance is not 1000");
+    });
+ %}
+
+
+### Get account2
+GET http://localhost:18080/v1/accounts/account2
+Accept: application/json
+
+> {%
+    client.test("Get account1", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.body.accountId === "account2", "accountId is not account1");
+        client.assert(response.body.balance === 2000, "balance is not 1000");
+    });
+ %}
