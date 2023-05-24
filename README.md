@@ -53,6 +53,16 @@ Before deploying this project into PROD I would pay attention on the next:
 - Enhance Logging.
 - Use persistence (Transactional DB) instead of in-memory Map.
 
+## Github Actions CI/CD
+I had a chance to play with Github Actions CI/CD and created a simple workflow to build and test this project.
+The [build-gradle.yaml](./.github/workflows/build-gradle.yaml) contains the workflow definition. All the results are available in the [Actions](https://github.com/vladimir22/dws-challenge/actions) tab.
+
+The links below refer to example results:
+- SonarLint report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097287259).
+- Unit tests coverage report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097286593).
+- Spotbugs report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097287656).
+
+
 
 
 
