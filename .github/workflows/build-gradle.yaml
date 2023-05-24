@@ -42,3 +42,14 @@ jobs:
           reporter: java-junit
           fail-on-error: true
 
+      - name: Publish Sonarlint Results ## https://www.linkedin.com/pulse/static-code-analysis-sonarlint-github-actions-lucas-persson/
+        uses: jwgmeligmeyling/spotbugs-github-action@v1.2
+        with:
+          name: Sonarlint
+          title: Sonarlint report
+          path: build/reports/sonarlint/*.xml
+      - name: Publish Spotbugs Results
+        uses: jwgmeligmeyling/spotbugs-github-action@v1.2
+        with:
+          name: Spotbugs
+          path: build/reports/spotbugs/*.xml

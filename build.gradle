@@ -2,7 +2,11 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.12'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+
+	id 'com.github.spotbugs' version '5.0.14'
+	id 'se.solrike.sonarlint' version '1.0.0-beta.9'
 }
+
 
 group = 'com.dws'
 version = '0.0.1-SNAPSHOT'
@@ -33,5 +37,36 @@ tasks.named('test') {
 test {
 	testLogging {
 		events "PASSED", "SKIPPED", "FAILED"
+	}
+}
+
+// SonarLint configuration:  // https://github.com/Lucas3oo/sonarlint-gradle-plugin#configure-sonarlint-plugin
+sonarlint {
+//	excludeRules = ['java:S5976']
+//	includeRules = ['java:S1176', 'java:S1696', 'java:S4266']
+//	ignoreFailures = false
+//	maxIssues = 0 // default 0
+//	showIssues = true // default true
+}
+
+// Github actions configuration, example: https://www.linkedin.com/pulse/static-code-analysis-sonarlint-github-actions-lucas-persson/
+sonarlintMain {
+	ignoreFailures = true
+
+	dependencies {
+		sonarlintPlugins 'org.sonarsource.java:sonar-java-plugin:7.17.0.31219'
+	}
+	reports {
+		xml.enabled = true
+	}
+}
+spotbugsMain {
+	ignoreFailures = true
+	dependencies {
+		spotbugs 'com.github.spotbugs:spotbugs:4.7.3'
+		spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0'
+	}
+	reports {
+		xml.enabled = true
 	}
 }

@@ -76,8 +76,9 @@ class MoneyTransferControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void amountIsEmpty() throws Exception {
+    @ParameterizedTest
+    @CsvSource({".", "0", "-1", "1000000"})
+    void amountIsWrong(String amount) throws Exception {
         mockMvc.perform(post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"accountId\":\"fromAccount-Id-456\",\"balance\":1000}")).andExpect(status().isCreated());
         mockMvc.perform(post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
@@ -86,49 +87,7 @@ class MoneyTransferControllerTest {
         mockMvc.perform(post("/v1/transfer").contentType(MediaType.APPLICATION_JSON)
                         .param("fromAccountId", "fromAccount-Id-123")
                         .param("toAccountId", "toAccount-Id-456")
-                        .param("amount", ""))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void amountIsZero() throws Exception {
-        mockMvc.perform(post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"accountId\":\"fromAccount-Id-456\",\"balance\":1000}")).andExpect(status().isCreated());
-        mockMvc.perform(post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"accountId\":\"toAccount-Id-456\",\"balance\":1000}")).andExpect(status().isCreated());
-
-        mockMvc.perform(post("/v1/transfer").contentType(MediaType.APPLICATION_JSON)
-                        .param("fromAccountId", "fromAccount-Id-123")
-                        .param("toAccountId", "toAccount-Id-456")
-                        .param("amount", ""))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void amountIsMinus() throws Exception {
-        mockMvc.perform(post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"accountId\":\"fromAccount-Id-456\",\"balance\":1000}")).andExpect(status().isCreated());
-        mockMvc.perform(post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"accountId\":\"toAccount-Id-456\",\"balance\":1000}")).andExpect(status().isCreated());
-
-        mockMvc.perform(post("/v1/transfer").contentType(MediaType.APPLICATION_JSON)
-                        .param("fromAccountId", "fromAccount-Id-123")
-                        .param("toAccountId", "toAccount-Id-456")
-                        .param("amount", "-1000"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void amountIsWrong() throws Exception {
-        mockMvc.perform(post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"accountId\":\"fromAccount-Id-456\",\"balance\":1000}")).andExpect(status().isCreated());
-        mockMvc.perform(post("/v1/accounts").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"accountId\":\"toAccount-Id-456\",\"balance\":1000}")).andExpect(status().isCreated());
-
-        mockMvc.perform(post("/v1/transfer").contentType(MediaType.APPLICATION_JSON)
-                        .param("fromAccountId", "fromAccount-Id-123")
-                        .param("toAccountId", "toAccount-Id-456")
-                        .param("amount", "100000"))
+                        .param("amount", amount))
                 .andExpect(status().isBadRequest());
     }
 
