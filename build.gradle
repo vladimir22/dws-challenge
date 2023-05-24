@@ -52,7 +52,6 @@ sonarlint {
 // Github actions configuration, example: https://www.linkedin.com/pulse/static-code-analysis-sonarlint-github-actions-lucas-persson/
 sonarlintMain {
 	ignoreFailures = true
-
 	dependencies {
 		sonarlintPlugins 'org.sonarsource.java:sonar-java-plugin:7.17.0.31219'
 	}

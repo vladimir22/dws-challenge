@@ -9,7 +9,7 @@ permissions: ## https://docs.github.com/en/actions/using-jobs/assigning-permissi
   pull-requests: write
   checks: write  ## fixed an Error: HttpError: Resource not accessible by integration: https://github.com/dorny/test-reporter/issues/149#issuecomment-1004820190
 
-## Build gradle project
+## Gradle project CI/CD example
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,13 +25,13 @@ jobs:
         uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
       - name: Build with Gradle
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
-
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Report ## https://octopus.com/blog/githubactions-running-unit-tests
+      ## Publish test-results: https://octopus.com/blog/githubactions-running-unit-tests
+      - name: Report
         uses: dorny/test-reporter@v1
         if: always() ## generate the report even if the Test step above was set to fail in the event of failed tests.
         with:
@@ -40,7 +40,8 @@ jobs:
           reporter: java-junit
           fail-on-error: true
 
-      - name: Publish Sonarlint Results ## https://www.linkedin.com/pulse/static-code-analysis-sonarlint-github-actions-lucas-persson/
+      ## Publish Sonarlint & Spotbugs reports: https://www.linkedin.com/pulse/static-code-analysis-sonarlint-github-actions-lucas-persson/
+      - name: Publish Sonarlint Results
         uses: jwgmeligmeyling/spotbugs-github-action@v1.2
         with:
           name: Sonarlint
