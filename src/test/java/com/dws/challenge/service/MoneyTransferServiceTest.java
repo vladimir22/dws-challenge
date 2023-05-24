@@ -3,7 +3,6 @@ package com.dws.challenge.service;
 import com.dws.challenge.domain.Account;
 import com.dws.challenge.exception.MoneyTransferException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

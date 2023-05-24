@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @Slf4j
@@ -27,8 +25,8 @@ public class MoneyTransferService {
         log.info("Money transfer started: amount='{}', fromAccount={}, toAccount={}", amount, fromAccount.getAccountId(), toAccount.getAccountId());
 
         // Sort accounts by account ID to avoid deadlocks
-        Account account1 =null;
-        Account account2 =null;
+        Account account1 = null;
+        Account account2 = null;
 
         if (fromAccount.getAccountId().compareTo(toAccount.getAccountId()) > 0) {
             account1 = fromAccount;
