@@ -60,7 +60,7 @@ The [build-gradle.yaml](./.github/workflows/build-gradle.yaml) contains the work
 
 The links below refer to example results:
 - SonarLint report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097287259).
-- Unit tests coverage report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097286593).
+- Unit tests report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097286593).
 - Spotbugs report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097287656).
 
 
