@@ -52,3 +52,24 @@ jobs:
         with:
           name: Spotbugs
           path: build/reports/spotbugs/*.xml
+
+      - name: Download ijhttp
+        run: curl -f -s -L -o ijhttp.zip https://jb.gg/ijhttp/latest
+      - name: Unpack ijhttp
+        run: unzip -nq ijhttp.zip -d target
+      - name: Remove ijhttp.zip
+        run: rm ijhttp.zip
+
+      - name: Run Spring Boot App and Wait
+        run: |
+          nohup ./gradlew bootRun &
+          for attempt in {1..20}; do sleep 1; if curl http://localhost:18080/v1/accounts/account; then echo ready; break; fi; echo waiting...; done 
+
+      - name: List files
+        run: ls -la target
+
+      - name: Remove ijhttp.zip
+        run: ./target/ijhttp/ijhttp ./HTTP/test-requests.http -r
+
+      - name: Stop Spring Boot App
+        run: ./gradlew -stop
