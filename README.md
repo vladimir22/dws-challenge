@@ -63,6 +63,8 @@ The links below refer to example results:
 - Unit tests report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097286593).
 - Spotbugs report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097287656).
 
+**TODO**: Wait for *NotificationService* implementation and expose IntelliJ HTTP Client [test-requests.http](./HTTP/test-requests.http) report using github actions.
+
 
 
 
