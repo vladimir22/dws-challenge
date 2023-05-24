@@ -58,12 +58,11 @@ I had a chance to play with Github Actions CI/CD and created a simple workflow t
 
 The [build-gradle.yaml](./.github/workflows/build-gradle.yaml) contains the workflow definition. All the results are available in the [Actions](https://github.com/vladimir22/dws-challenge/actions) tab.
 
-The set of links below refer to example results:
+The set of links below refer to examples of the test reports:
 - SonarLint report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097287259).
 - Unit tests report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097286593).
 - Spotbugs report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5066895224/jobs/9097287656).
-- Intellij HTTP Client report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5069408889/jobs/9102992064) ( Current example has been taken from the [PR-1](https://github.com/vladimir22/dws-challenge/pull/1) which contains implementation of *NotificationService*)
-
+- Intellij HTTP Client report is available [here](https://github.com/vladimir22/dws-challenge/actions/runs/5069408889/jobs/9102992064) (report example has been taken from the [PR-1](https://github.com/vladimir22/dws-challenge/pull/1) which contains implementation of *NotificationService* to run properly integration tests described in the [test-requests.http](https://github.com/vladimir22/dws-challenge/blob/main/HTTP/test-requests.http) file)
 
 
 
